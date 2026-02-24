@@ -21,11 +21,14 @@ app.set('io', io);
 connectDB();
 
 // Middleware
-app.use(cors({
-  origin: FRONTEND_ORIGIN,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-}));
+app.use(
+  cors({
+    origin: FRONTEND_ORIGIN,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 
 app.options('*', cors());
 app.use(express.json());
