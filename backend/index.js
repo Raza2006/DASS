@@ -30,7 +30,6 @@ app.use(
   }),
 );
 
-app.options('*', cors());
 app.use(express.json());
 
 // Serve uploaded payment proof images as static files
