@@ -21,7 +21,13 @@ app.set('io', io);
 connectDB();
 
 // Middleware
-app.use(cors({ origin: FRONTEND_ORIGIN }));
+app.use(cors({
+  origin: FRONTEND_ORIGIN,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+}));
+
+app.options('*', cors());
 app.use(express.json());
 
 // Serve uploaded payment proof images as static files
