@@ -11,15 +11,6 @@ dotenv.config();
 const FRONTEND_ORIGIN = process.env.FRONTEND_URL || 'http://localhost:3000';
 
 const app    = express();
-const server = http.createServer(app);
-const io     = new Server(server, {
-  cors: { origin: FRONTEND_ORIGIN, methods: ['GET', 'POST', 'PATCH', 'DELETE'] },
-});
-
-app.set('io', io);
-
-connectDB();
-
 // Middleware
 const allowedOrigins = [
   'http://localhost:3000',
@@ -39,6 +30,15 @@ app.use(
     credentials: true,
   })
 );
+const server = http.createServer(app);
+const io     = new Server(server, {
+  cors: { origin: FRONTEND_ORIGIN, methods: ['GET', 'POST', 'PATCH', 'DELETE'] },
+});
+
+app.set('io', io);
+
+connectDB();
+
 
 app.use(express.json());
 
