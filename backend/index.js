@@ -21,13 +21,23 @@ app.set('io', io);
 connectDB();
 
 // Middleware
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://dass-ruddy.vercel.app',
+];
+
 app.use(
   cors({
-    origin: FRONTEND_ORIGIN,
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  }),
+  })
 );
 
 app.use(express.json());
