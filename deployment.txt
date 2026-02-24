@@ -1,0 +1,129 @@
+﻿## Production URLs
+
+Frontend URL : https://<your-app>.vercel.app
+Backend URL  : https://<your-app>.onrender.com
+
+---
+
+## Deployment Instructions
+
+### Step 1 — Deploy Backend to Render (render.com)
+
+1. Push your code to a GitHub repository.
+2. Go to https://render.com → New → Web Service → connect your repo.
+3. Set the following:
+     Root directory : backend
+     Build command  : npm install
+     Start command  : npm start
+     Environment    : Node
+4. Add these Environment Variables in the Render dashboard:
+     MONGO_URI     = <your Atlas connection string>
+     JWT_SECRET    = <random string, min 32 chars>
+     FRONTEND_URL  = https://<your-app>.vercel.app   (fill in after Vercel deploy)
+     SMTP_HOST     = smtp.gmail.com
+     SMTP_PORT     = 587
+     SMTP_SECURE   = false
+     SMTP_USER     = <your Gmail>
+     SMTP_PASS     = <16-char App Password>
+     SMTP_FROM     = "Felicity Events" <your Gmail>
+5. Click Deploy. Copy the service URL (e.g. https://felicity-api.onrender.com).
+
+Note: Render free tier spins down after 15 min of inactivity. First request after
+sleep takes ~30 s. Upgrade to a paid instance to avoid cold starts in evaluation.
+
+---
+
+### Step 2 — Deploy Frontend to Vercel (vercel.com)
+
+1. Go to https://vercel.com → New Project → import your GitHub repo.
+2. Set:
+     Root directory    : frontend
+     Framework preset  : Create React App
+     Build command     : npm run build      (auto-detected)
+     Output directory  : build              (auto-detected)
+3. Add this Environment Variable:
+     REACT_APP_API_URL = https://<your-render-service>.onrender.com/api
+4. Click Deploy. Copy the Vercel URL (e.g. https://felicity.vercel.app).
+5. Go back to Render → your service → Environment → update FRONTEND_URL to the
+   Vercel URL, then redeploy.
+
+---
+
+### Step 3 — Seed Admin on Production
+
+After the Render service is live, open a browser and run the seed via the
+Render dashboard Shell tab (or use the Render one-off jobs feature):
+  node scripts/seedAdmin.js
+Credentials: admin@felicity.iiit.ac.in / Admin@123
+
+---
+
+### Local Setup
+
+1. Set up backend:
+   cd backend
+   npm install
+   # Create backend/.env with the variables listed below
+   npm start          (production  port 5000)
+   npm run dev        (development  nodemon auto-restart)
+
+2. Set up frontend:
+   cd frontend
+   npm install
+   npm start          (port 3000)
+
+Both servers must run simultaneously. Open http://localhost:3000.
+
+---
+
+### Environment Variables (backend/.env)
+
+MONGO_URI=mongodb+srv://<user>:<pass>@cluster0.xxxxx.mongodb.net/felicityDB?retryWrites=true&w=majority
+JWT_SECRET=any_random_string_min_32_chars
+PORT=5000
+
+# Email via Gmail SMTP (optional  app works without these but no emails are sent)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your_gmail@gmail.com
+SMTP_PASS=xxxx xxxx xxxx xxxx    (16-char Gmail App Password)
+SMTP_FROM="Felicity Events" <your_gmail@gmail.com>
+
+To generate a Gmail App Password:
+  Google Account  Security  2-Step Verification  App Passwords
+  Select app: "Mail", device: any  copy the 16-char password.
+
+---
+
+### Creating an Admin Account
+
+Option 1  Seed script (recommended):
+  cd backend
+  npm run seed:admin
+  Credentials: admin@felicity.iiit.ac.in / Admin@123
+
+Option 2  MongoDB Atlas UI:
+  Register a normal account  Atlas  felicityDB  users collection 
+  find the document  set "role" to "admin"  save.
+
+Option 3  MongoDB Shell:
+  db.users.updateOne({ email: "your@email.com" }, { $set: { role: "admin" } })
+
+---
+
+### File Uploads (Merchandise Payment Proofs)
+
+Uploaded images are stored in backend/uploads/ and served as static files.
+The directory is created automatically on first upload.
+For production, replace disk storage with S3 / GCS.
+
+---
+
+### Tech Stack Summary
+
+Backend:  Node.js v18+, Express v5, MongoDB Atlas, Mongoose v9, bcryptjs,
+          jsonwebtoken, nodemailer, qrcode, multer, socket.io, dotenv, cors
+
+Frontend: React 18, react-router-dom v6, axios, socket.io-client v4,
+          qrcode.react v4, react-scripts v5 (CRA / Webpack + Babel)
