@@ -161,7 +161,7 @@ cd backend
 npm run seed:admin
 ```
 
-Credentials: `admin@felicity.iiit.ac.in` / `Admin@123`
+Credentials: `admin@iiit.ac.in` / `admin@12345`
 
 ---
 
